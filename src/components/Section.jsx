@@ -98,18 +98,19 @@ export default function Section({ section, index, registerRef }) {
       {/* header */}
       <Reveal>
         <div className="flex items-start gap-4 mb-6">
-          <div className="shrink-0 w-12 h-12 rounded-xl bg-sunken border border-app grid place-items-center text-accent">
+          <div className="icon-tile shrink-0 w-12 h-12 rounded-xl grid place-items-center text-accent">
             <Icon name={icon} size={24} />
           </div>
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-[11px] font-mono text-muted">{String(index + 1).padStart(2, '0')}</span>
+              <span className="index-pill">{String(index + 1).padStart(2, '0')}</span>
               <h2 className="text-2xl md:text-3xl font-serif font-semibold tracking-tight">{title}</h2>
             </div>
             <p className="text-accent text-[15px] mt-0.5 font-medium">{tagline}</p>
           </div>
         </div>
-        <p className="text-[15px] md:text-base text-muted leading-relaxed max-w-3xl mb-8">{blurb}</p>
+        <p className="text-[15px] md:text-base text-muted leading-relaxed max-w-3xl mb-5">{blurb}</p>
+        <div className="section-rule mb-8" />
       </Reveal>
 
       {slashRef && <SlashReference />}

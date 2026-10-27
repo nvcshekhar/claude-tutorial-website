@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import Icon from './Icons'
 import { SECTIONS, CATEGORIES } from '../data/content'
 
@@ -58,15 +59,28 @@ export default function CommandPalette({ open, onClose, onNavigate }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [open, results, active, onClose, onNavigate])
 
-  if (!open) return null
   const catLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label || ''
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4" onClick={onClose}>
+    <AnimatePresence>
+    {open && (
+    <motion.div
+      key="palette"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4"
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+    >
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div
+      <motion.div
         className="relative w-full max-w-xl card glass-modal overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 10, scale: 0.98 }}
+        transition={{ type: 'spring', stiffness: 420, damping: 32 }}
       >
         <div className="flex items-center gap-3 px-4 border-b border-app">
           <Icon name="search" size={18} className="text-muted" />
@@ -109,7 +123,9 @@ export default function CommandPalette({ open, onClose, onNavigate }) {
           <span><span className="kbd">↵</span> jump</span>
           <span><span className="kbd">esc</span> close</span>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
+    )}
+    </AnimatePresence>
   )
 }

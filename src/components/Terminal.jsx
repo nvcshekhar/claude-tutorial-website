@@ -113,7 +113,7 @@ export default function Terminal({ title = 'claude', lines = [] }) {
       <div className="flex items-center gap-2 px-4 py-2.5 border-b" style={{ borderColor: '#2c2823', background: '#13110f' }}>
         <span className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
         <span className="w-3 h-3 rounded-full" style={{ background: '#febc2e' }} />
-        <span className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+        <span className={`w-3 h-3 rounded-full ${done ? '' : 'term-live'}`} style={{ background: '#28c840' }} />
         <span className="ml-2 text-xs tracking-wide" style={{ color: '#6b6359', fontFamily: 'var(--font-mono)' }}>
           {title}
         </span>
@@ -127,10 +127,11 @@ export default function Terminal({ title = 'claude', lines = [] }) {
         </button>
       </div>
       {/* body */}
-      <div className="p-4 text-[13px] min-h-[200px]" style={{ fontFamily: 'var(--font-mono)' }}>
+      <div className="relative p-4 text-[13px] min-h-[200px]" style={{ fontFamily: 'var(--font-mono)' }}>
         {rendered.map((l, idx) => renderLine(l, idx))}
         {typing && renderLine(typing, 'typing', typing.kind === 'prompt' ? typedLen : null)}
         {done && <div className="term-cursor mt-1" />}
+        <div className="term-scan" aria-hidden="true" />
       </div>
     </div>
   )

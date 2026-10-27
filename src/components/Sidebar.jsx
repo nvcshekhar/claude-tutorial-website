@@ -10,7 +10,10 @@ export default function Sidebar({ activeId, onNavigate, visited, progressPct }) 
           <span>{progressPct}%</span>
         </div>
         <div className="h-1.5 rounded-full bg-sunken overflow-hidden">
-          <div className="h-full rounded-full bg-accent transition-all duration-500" style={{ width: `${progressPct}%` }} />
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${progressPct > 0 ? 'progress-glow progress-spark' : ''}`}
+            style={{ width: `${progressPct}%` }}
+          />
         </div>
       </div>
 
@@ -29,7 +32,7 @@ export default function Sidebar({ activeId, onNavigate, visited, progressPct }) 
                   key={s.id}
                   onClick={() => onNavigate(s.id)}
                   className={`group w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-[13.5px] transition
-                    ${active ? 'glass text-app font-semibold' : 'text-muted hover:text-app hover:bg-sunken/60'}`}
+                    ${active ? 'glass nav-active text-app font-semibold' : 'text-muted hover:text-app hover:bg-sunken/60'}`}
                 >
                   <span className={`shrink-0 ${active ? 'text-accent' : 'text-muted group-hover:text-accent'} transition`}>
                     <Icon name={s.icon} size={16} />

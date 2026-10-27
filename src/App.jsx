@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Lenis from 'lenis'
+import { motion } from 'motion/react'
 import Icon from './components/Icons'
 import Hero from './components/Hero'
 import Sidebar from './components/Sidebar'
 import Section from './components/Section'
 import CommandPalette from './components/CommandPalette'
+import Atmosphere from './components/Atmosphere'
 import { SECTIONS, CATEGORIES } from './data/content'
 
 function useTheme() {
@@ -24,7 +26,7 @@ function ThemeToggle({ dark, setDark }) {
   return (
     <button
       onClick={() => setDark((d) => !d)}
-      className="w-9 h-9 grid place-items-center rounded-lg border border-app bg-elevated text-muted hover:text-accent transition"
+      className="header-btn w-9 h-9 grid place-items-center rounded-lg border border-app bg-elevated text-muted hover:text-accent"
       aria-label="Toggle dark mode"
       title="Toggle theme"
     >
@@ -49,6 +51,10 @@ export default function App() {
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.05, wheelMultiplier: 1 })
     lenisRef.current = lenis
+    const onScroll = ({ scroll }) => {
+      document.documentElement.classList.toggle('is-scrolled', scroll > 12)
+    }
+    lenis.on('scroll', onScroll)
     let rafId
     const raf = (time) => { lenis.raf(time); rafId = requestAnimationFrame(raf) }
     rafId = requestAnimationFrame(raf)
@@ -110,12 +116,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-app text-app">
-      <div className="bg-aurora-fixed" aria-hidden="true" />
+      <Atmosphere />
+      <div className="relative z-[1]">
       {/* top bar */}
-      <div className="glass-bar sticky top-0 z-40">
+      <div className="site-header glass-bar sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-5 h-14 flex items-center gap-3">
           <button onClick={() => smoothScrollTo(0)} className="flex items-center gap-2.5 font-semibold">
-            <span className="w-7 h-7 rounded-lg grid place-items-center text-white shrink-0" style={{ background: 'var(--terminal-bg)' }}>
+            <span className="logo-mark w-7 h-7 rounded-lg grid place-items-center text-white shrink-0" style={{ background: 'var(--terminal-bg)' }}>
               <span className="text-accent font-mono text-sm">&gt;_</span>
             </span>
             <span className="hidden sm:block">Claude Code <span className="text-accent">Academy</span></span>
@@ -128,14 +135,14 @@ export default function App() {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setPaletteOpen(true)}
-              className="hidden sm:flex items-center gap-2 px-3 h-9 rounded-lg border border-app bg-elevated text-[13px] text-muted hover:text-app transition"
+              className="header-btn hidden sm:flex items-center gap-2 px-3 h-9 rounded-lg border border-app bg-elevated text-[13px] text-muted hover:text-app"
             >
               <Icon name="search" size={15} /> Search <span className="kbd ml-1">⌘K</span>
             </button>
             <a
               href="https://docs.claude.com/en/docs/claude-code"
               target="_blank" rel="noreferrer"
-              className="hidden sm:flex items-center gap-1.5 px-3 h-9 rounded-lg border border-app bg-elevated text-[13px] text-muted hover:text-app transition"
+              className="header-btn hidden sm:flex items-center gap-1.5 px-3 h-9 rounded-lg border border-app bg-elevated text-[13px] text-muted hover:text-app"
             >
               Docs <Icon name="arrow" size={14} />
             </a>
@@ -150,8 +157,11 @@ export default function App() {
           </div>
         </div>
         {/* progress bar under header */}
-        <div className="h-0.5 bg-transparent">
-          <div className="h-full bg-accent transition-all duration-500" style={{ width: `${progressPct}%` }} />
+        <div className="h-[3px] bg-transparent">
+          <div
+            className={`h-full transition-all duration-500 ${progressPct > 0 ? 'progress-glow progress-spark' : ''}`}
+            style={{ width: `${progressPct}%` }}
+          />
         </div>
       </div>
 
@@ -159,7 +169,7 @@ export default function App() {
       {mobileNav && (
         <div className="lg:hidden fixed inset-0 z-30 pt-14" onClick={() => setMobileNav(false)}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-          <div className="glass-bar glass-modal relative max-h-[80vh] overflow-y-auto p-4" onClick={(e) => e.stopPropagation()}>
+          <div className="drawer-in glass-bar glass-modal relative max-h-[80vh] overflow-y-auto p-4" onClick={(e) => e.stopPropagation()}>
             {CATEGORIES.map((cat) => (
               <div key={cat.id} className="mb-3">
                 <div className="px-2 py-1 text-[11px] uppercase tracking-wider text-muted font-semibold">{cat.label}</div>
@@ -187,7 +197,16 @@ export default function App() {
           ))}
 
           {/* closing CTA */}
-          <section className="mt-12 card p-8 md:p-12 text-center bg-aurora">
+          <motion.section
+            className="relative mt-12 card overflow-hidden p-8 md:p-12 text-center bg-aurora"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.35 }}
+            transition={{ type: 'spring', stiffness: 140, damping: 18 }}
+          >
+            <div className="cta-rings" aria-hidden="true" />
+            <span className="cta-mark" aria-hidden="true">&gt;_</span>
+            <div className="relative z-[1]">
             <h2 className="font-serif text-3xl font-semibold mb-3">You've got the whole toolkit.</h2>
             <p className="text-muted max-w-xl mx-auto mb-6">
               Open a terminal, run <code className="text-accent font-mono">claude</code>, and put these features to work.
@@ -195,7 +214,7 @@ export default function App() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <button onClick={() => smoothScrollTo(0)}
-                className="px-5 py-3 rounded-xl bg-accent text-white font-semibold" style={{ background: 'var(--accent)' }}>
+                className="btn-shine px-5 py-3 rounded-xl bg-accent text-white font-semibold" style={{ background: 'var(--accent)' }}>
                 Back to top
               </button>
               <a href="https://docs.claude.com/en/docs/claude-code" target="_blank" rel="noreferrer"
@@ -203,11 +222,12 @@ export default function App() {
                 Read the official docs
               </a>
             </div>
-          </section>
+            </div>
+          </motion.section>
         </div>
       </main>
 
-      <footer className="border-t border-app">
+      <footer className="site-footer border-t border-app">
         <div className="max-w-6xl mx-auto px-5 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-muted">
           <span>Claude Code Academy · an interactive feature tutorial</span>
           <span>Built for engineers who want the best workflow.</span>
@@ -215,6 +235,7 @@ export default function App() {
       </footer>
 
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} onNavigate={navigate} />
+      </div>
     </div>
   )
 }

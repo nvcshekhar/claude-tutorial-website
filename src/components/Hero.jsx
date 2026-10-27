@@ -14,7 +14,7 @@ export default function Hero({ onStart, onSearch }) {
     <header className="relative overflow-hidden bg-aurora">
       <div className="max-w-6xl mx-auto px-5 pt-16 pb-14 md:pt-24 md:pb-20 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-app bg-elevated/60 backdrop-blur text-[12.5px] text-muted mb-6 floaty">
+          <div className="glass inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[12.5px] text-muted mb-6 floaty">
             <span className="w-2 h-2 rounded-full bg-accent" />
             Interactive guide · CLI &amp; macOS desktop app
           </div>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Lenis from 'lenis'
 import Icon from './components/Icons'
 import Hero from './components/Hero'
 import Sidebar from './components/Sidebar'
@@ -39,8 +40,27 @@ export default function App() {
   const [visited, setVisited] = useState(() => new Set())
   const [mobileNav, setMobileNav] = useState(false)
   const refs = useRef({})
+  const lenisRef = useRef(null)
 
   const registerRef = useCallback((id, el) => { if (el) refs.current[id] = el }, [])
+
+  // Buttery site-wide smooth scroll — drives both manual wheel/touch input
+  // and every programmatic jump-to-section below.
+  useEffect(() => {
+    const lenis = new Lenis({ duration: 1.05, wheelMultiplier: 1 })
+    lenisRef.current = lenis
+    let rafId
+    const raf = (time) => { lenis.raf(time); rafId = requestAnimationFrame(raf) }
+    rafId = requestAnimationFrame(raf)
+    return () => { cancelAnimationFrame(rafId); lenis.destroy(); lenisRef.current = null }
+  }, [])
+
+  const smoothScrollTo = useCallback((target) => {
+    lenisRef.current?.scrollTo(target, {
+      duration: 0.9,
+      easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)), // fast start, smooth settle
+    })
+  }, [])
 
   // ⌘K / Ctrl+K to open palette
   useEffect(() => {
@@ -76,10 +96,10 @@ export default function App() {
 
   const navigate = useCallback((id) => {
     const el = refs.current[id] || document.getElementById(id)
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (el) smoothScrollTo(el)
     setActiveId(id)
     setMobileNav(false)
-  }, [])
+  }, [smoothScrollTo])
 
   const progressPct = Math.round((visited.size / SECTIONS.length) * 100)
 
@@ -90,10 +110,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-app text-app">
+      <div className="bg-aurora-fixed" aria-hidden="true" />
       {/* top bar */}
-      <div className="sticky top-0 z-40 border-b border-app bg-app/85 backdrop-blur-md">
+      <div className="glass-bar sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-5 h-14 flex items-center gap-3">
-          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2.5 font-semibold">
+          <button onClick={() => smoothScrollTo(0)} className="flex items-center gap-2.5 font-semibold">
             <span className="w-7 h-7 rounded-lg grid place-items-center text-white shrink-0" style={{ background: 'var(--terminal-bg)' }}>
               <span className="text-accent font-mono text-sm">&gt;_</span>
             </span>
@@ -137,8 +158,8 @@ export default function App() {
       {/* mobile nav drawer */}
       {mobileNav && (
         <div className="lg:hidden fixed inset-0 z-30 pt-14" onClick={() => setMobileNav(false)}>
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="relative bg-app border-b border-app max-h-[80vh] overflow-y-auto p-4" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="glass-bar glass-modal relative max-h-[80vh] overflow-y-auto p-4" onClick={(e) => e.stopPropagation()}>
             {CATEGORIES.map((cat) => (
               <div key={cat.id} className="mb-3">
                 <div className="px-2 py-1 text-[11px] uppercase tracking-wider text-muted font-semibold">{cat.label}</div>
@@ -173,7 +194,7 @@ export default function App() {
               Tune your CLAUDE.md, wire up a hook, delegate to a subagent — and ship faster.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              <button onClick={() => smoothScrollTo(0)}
                 className="px-5 py-3 rounded-xl bg-accent text-white font-semibold" style={{ background: 'var(--accent)' }}>
                 Back to top
               </button>

@@ -1,25 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
+import { motion } from 'motion/react'
 import Icon from './Icons'
 import Terminal from './Terminal'
 import SlashReference from './SlashReference'
 
 function Reveal({ children, delay = 0, className = '' }) {
-  const ref = useRef(null)
-  const [show, setShow] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setShow(true); io.disconnect() } },
-      { threshold: 0.15 },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
   return (
-    <div ref={ref} className={`reveal ${show ? 'in' : ''} ${className}`} style={{ animationDelay: `${delay}ms` }}>
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15, margin: '0px 0px -10% 0px' }}
+      transition={{ type: 'spring', stiffness: 140, damping: 18, mass: 0.6, delay: delay / 1000 }}
+    >
       {children}
-    </div>
+    </motion.div>
   )
 }
 

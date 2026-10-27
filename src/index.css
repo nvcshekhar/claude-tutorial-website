@@ -44,6 +44,12 @@
   --terminal-bg: #1a1816;
   --terminal-text: #e8dfd2;
   --shadow-color: 30 25 20;
+  --glass-bg: color-mix(in srgb, var(--bg-elevated) 62%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--bg-elevated) 84%, transparent);
+  --glass-border: color-mix(in srgb, #ffffff 20%, var(--border));
+  --glass-highlight: color-mix(in srgb, #ffffff 70%, transparent);
+  --glass-blur: blur(20px) saturate(160%);
+  --glass-blur-soft: blur(12px) saturate(150%);
   color-scheme: light;
 }
 
@@ -59,12 +65,18 @@ html.dark {
   --terminal-bg: #050505;
   --terminal-text: #e8dfd2;
   --shadow-color: 0 0 0;
+  --glass-bg: color-mix(in srgb, var(--bg-elevated) 48%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--bg-elevated) 74%, transparent);
+  --glass-border: color-mix(in srgb, #ffffff 14%, var(--border));
+  --glass-highlight: color-mix(in srgb, #ffffff 10%, transparent);
   color-scheme: dark;
 }
 
 * { border-color: var(--border); }
 
-html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+html { scroll-padding-top: 5rem; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
 
 body {
   background-color: var(--bg);
@@ -81,6 +93,18 @@ body {
     radial-gradient(50rem 30rem at 0% 10%, color-mix(in srgb, var(--color-clay-300) 16%, transparent), transparent 60%);
 }
 
+/* Page-wide glow that glass panels blur against, no matter how far down you scroll */
+.bg-aurora-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(55rem 38rem at 90% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(45rem 34rem at 5% 30%, color-mix(in srgb, var(--color-clay-300) 12%, transparent), transparent 65%),
+    radial-gradient(50rem 40rem at 50% 100%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%);
+}
+
 /* Utility tokens bound to CSS vars */
 .bg-app { background-color: var(--bg); }
 .bg-elevated { background-color: var(--bg-elevated); }
@@ -91,17 +115,49 @@ body {
 .bg-accent { background-color: var(--accent); }
 .border-app { border-color: var(--border); }
 
+/* Frosted-glass surface: translucent fill + blur + light-catching edge */
+.glass {
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 1px 2px rgb(var(--shadow-color) / 0.04),
+    0 8px 24px -12px rgb(var(--shadow-color) / 0.14);
+}
+
+/* Flush glass bar for docked edges (header) — bottom hairline only, no shadow lift */
+.glass-bar {
+  background-color: var(--glass-bg);
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* Higher-opacity glass for panels that float over their own dark scrim (palette, drawer) */
+.glass-modal {
+  background-color: var(--glass-bg-strong);
+}
+
 .card {
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border);
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 1rem;
-  box-shadow: 0 1px 2px rgb(var(--shadow-color) / 0.04), 0 8px 24px -12px rgb(var(--shadow-color) / 0.10);
+  backdrop-filter: var(--glass-blur-soft);
+  -webkit-backdrop-filter: var(--glass-blur-soft);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 1px 2px rgb(var(--shadow-color) / 0.04),
+    0 8px 24px -12px rgb(var(--shadow-color) / 0.10);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px -12px rgb(var(--shadow-color) / 0.22);
-  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 12px 40px -12px rgb(var(--shadow-color) / 0.22);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--glass-border));
 }
 
 /* Scrollbar */
@@ -127,10 +183,6 @@ body {
 @keyframes blink { 50% { opacity: 0; } }
 
 /* Animations */
-@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-.reveal { opacity: 0; }
-.reveal.in { animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-
 @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 .floaty { animation: floaty 6s ease-in-out infinite; }
 
@@ -159,8 +211,8 @@ body {
   font-size: 0.72rem;
   padding: 0.12rem 0.45rem;
   border-radius: 0.4rem;
-  background: var(--bg-sunken);
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-sunken) 70%, transparent);
+  border: 1px solid var(--glass-border);
   box-shadow: 0 2px 0 var(--border);
   white-space: nowrap;
 }

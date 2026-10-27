@@ -65,7 +65,7 @@ export default function CommandPalette({ open, onClose, onNavigate }) {
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-xl card overflow-hidden shadow-2xl"
+        className="relative w-full max-w-xl card glass-modal overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 px-4 border-b border-app">

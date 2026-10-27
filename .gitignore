@@ -5,3 +5,6 @@ dist-ssr
 .DS_Store
 .vite
 npm-debug.log*
+
+# Local Ori agent state (session logs and SQLite)
+.ori/
